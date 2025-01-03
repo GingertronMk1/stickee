@@ -33,7 +33,7 @@ readonly class WidgetCounter implements WidgetCounterInterface
         }
 
         foreach ($lookup as $n) {
-            while ($num > $n) {
+            while ($num >= $n) {
                 $packsToSend[$n] = ($packsToSend[$n] ?? 0) + 1;
                 $num -= $n;
             }

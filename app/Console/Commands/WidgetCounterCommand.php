@@ -37,9 +37,6 @@ class WidgetCounterCommand extends Command
         $table = [];
 
         foreach ($result as $pack => $number) {
-            if ($number === 0) {
-                continue;
-            }
             $table[] = [$pack, $number];
         }
 

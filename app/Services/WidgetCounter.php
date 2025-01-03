@@ -27,11 +27,6 @@ readonly class WidgetCounter implements WidgetCounterInterface
         $lookup = array_reverse($this->packCount);
         $packsToSend = [];
 
-        // Special case for those "exact match" situations
-        if (in_array($num, $lookup)) {
-            return [$num => 1];
-        }
-
         foreach ($lookup as $n) {
             while ($num >= $n) {
                 $packsToSend[$n] = ($packsToSend[$n] ?? 0) + 1;

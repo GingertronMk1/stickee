@@ -6,9 +6,9 @@ use App\WidgetCounterInterface;
 
 class WidgetCounter implements WidgetCounterInterface
 {
-
     public function getWidgetPacks(int $widgetsOrdered): array
     {
-        return [];
+        $packs = config('widgets.packs');
+        return $packs;
     }
 }

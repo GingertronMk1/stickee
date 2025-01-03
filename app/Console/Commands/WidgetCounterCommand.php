@@ -9,8 +9,7 @@ class WidgetCounterCommand extends Command
 {
     public function __construct(
         private readonly WidgetCounterInterface $widgetCounter
-    )
-    {
+    ) {
         parent::__construct();
     }
 
@@ -48,6 +47,7 @@ class WidgetCounterCommand extends Command
             ['Pack Size', 'Count'],
             $table
         );
+
         return self::SUCCESS;
     }
 }

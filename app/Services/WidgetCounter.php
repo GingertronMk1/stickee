@@ -4,14 +4,14 @@ namespace App\Services;
 
 use App\WidgetCounterInterface;
 
-class WidgetCounter implements WidgetCounterInterface
+readonly class WidgetCounter implements WidgetCounterInterface
 {
-    private readonly array $packCount;
+    /** @var array<int> */
+    private array $packCount;
 
     public function __construct(
         ?array $packCount = null
-    )
-    {
+    ) {
         $packCount ??= config('widgets.packs');
         ksort($packCount);
         $this->packCount = $packCount;
@@ -19,10 +19,10 @@ class WidgetCounter implements WidgetCounterInterface
 
     public function getWidgetPacks(int $widgetsOrdered): array
     {
-        return $this->romanize($widgetsOrdered);
+        return $this->recursiveGetPacks($widgetsOrdered, true);
     }
 
-    private function romanize($num, bool $firstRound = true)
+    private function recursiveGetPacks(int $num, bool $firstRound)
     {
         $lookup = array_reverse($this->packCount);
         $roman = [];
@@ -45,7 +45,7 @@ class WidgetCounter implements WidgetCounterInterface
             $roman[$smallest] = ($roman[$smallest] ?? 0) + 1;
         }
 
-        if (!$firstRound) {
+        if (! $firstRound) {
             return $roman;
         }
 
@@ -55,7 +55,7 @@ class WidgetCounter implements WidgetCounterInterface
             $totalValue += $v * $n;
         }
 
-        $reDone = $this->romanize($totalValue, false);
+        $reDone = $this->recursiveGetPacks($totalValue, false);
 
         if (array_sum($reDone) < array_sum($roman)) {
             return $reDone;
@@ -63,5 +63,4 @@ class WidgetCounter implements WidgetCounterInterface
 
         return $roman;
     }
-
 }

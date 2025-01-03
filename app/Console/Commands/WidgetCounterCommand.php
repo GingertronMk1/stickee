@@ -19,7 +19,7 @@ class WidgetCounterCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'app:widget-counter-command';
+    protected $signature = 'app:widget-counter-command {widgets}';
 
     /**
      * The console command description.
@@ -33,7 +33,21 @@ class WidgetCounterCommand extends Command
      */
     public function handle(): int
     {
-        $this->getOutput()->listing($this->widgetCounter->getWidgetPacks(1));
+        $widgetCount = $this->argument('widgets');
+        $result = $this->widgetCounter->getWidgetPacks($widgetCount);
+        $table = [];
+
+        foreach ($result as $pack => $number) {
+            if ($number === 0) {
+                continue;
+            }
+            $table[] = [$pack, $number];
+        }
+
+        $this->table(
+            ['Pack Size', 'Count'],
+            $table
+        );
         return self::SUCCESS;
     }
 }

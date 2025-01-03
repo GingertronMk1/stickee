@@ -25,7 +25,7 @@ readonly class WidgetCounter implements WidgetCounterInterface
     private function recursiveGetPacks(int $num, bool $firstRound)
     {
         $lookup = array_reverse($this->packCount);
-        $roman = [];
+        $packsToSend = [];
 
         // Special case for those "exact match" situations
         if (in_array($num, $lookup)) {
@@ -34,7 +34,7 @@ readonly class WidgetCounter implements WidgetCounterInterface
 
         foreach ($lookup as $n) {
             while ($num > $n) {
-                $roman[$n] = ($roman[$n] ?? 0) + 1;
+                $packsToSend[$n] = ($packsToSend[$n] ?? 0) + 1;
                 $num -= $n;
             }
         }
@@ -42,25 +42,32 @@ readonly class WidgetCounter implements WidgetCounterInterface
         // Those cases where we don't quite get it
         if ($num > 0) {
             $smallest = min($lookup);
-            $roman[$smallest] = ($roman[$smallest] ?? 0) + 1;
+            $packsToSend[$smallest] = ($packsToSend[$smallest] ?? 0) + 1;
         }
 
+        // Only doing one "round" of computation here
         if (! $firstRound) {
-            return $roman;
+            return $packsToSend;
         }
 
+        /**
+         * Here we calculate the total number of widgets we're sending
+         * We are confident that the above code works to send the least "extra" widgets
+         * so we now run this total number of widgets back through the code to see if we
+         * can send the same amount in fewer packs
+         */
         $totalValue = 0;
 
-        foreach ($roman as $v => $n) {
+        foreach ($packsToSend as $v => $n) {
             $totalValue += $v * $n;
         }
 
         $reDone = $this->recursiveGetPacks($totalValue, false);
 
-        if (array_sum($reDone) < array_sum($roman)) {
+        if (array_sum($reDone) < array_sum($packsToSend)) {
             return $reDone;
         }
 
-        return $roman;
+        return $packsToSend;
     }
 }

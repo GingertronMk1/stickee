@@ -1,5 +1,6 @@
 <?php
 
 return [
-    'packs' => explode(',', env('WIDGET_PACKS', '')),
+    'packs' =>
+    json_decode(env('WIDGET_PACKS', '[]'), true),
 ];

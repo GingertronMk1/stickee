@@ -33,7 +33,7 @@ class WidgetCounterCommand extends Command
     public function handle(): int
     {
         $widgetCount = $this->argument('widgets');
-        $result = $this->widgetCounter->getWidgetPacks($widgetCount);
+        $result = $this->widgetCounter->getWidgetPacks($widgetCount)->packs;
         $table = [];
 
         foreach ($result as $pack => $number) {

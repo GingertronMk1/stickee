@@ -1,66 +1,61 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Technical Test for Stickee
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+### Description
 
-## About Laravel
+This is a platform built using Laravel, Tailwind, Typescript, and Inertia for the completion of a technical task given to me by Stickee.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The objective of this platform is to tell a widget company, Wally's Widgets, what combination of packs to send out for a given order size.
+The rules for these combinations are as follows:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+1. Only whole packs can be sent. Packs cannot be broken open.
+2. Within the constraints of Rule 1 above, send out no more widgets than necessary to fulfil
+   the order.
+3. Within the constraints of Rules 1 & 2 above, send out as few packs as possible to fulfil each
+   order.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+The initial set of pack sizes is
 
-## Learning Laravel
+- 250 widgets
+- 500 widgets
+- 1,000 widgets
+- 2,000 widgets
+- 5,000 widgets
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Rationales
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+##### Dependency Injection
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+I abstracted the actual service out such that I could typehint an interface in multiple scenarios and Laravel will automatically insert the correct class.
 
-## Laravel Sponsors
+##### "Config Injection"
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Based on the work I've done in Symfony in the past I know that it is possible to pass in configurations to services.
+My knowledge of Laravel does not tell me if that is possible within the platform, hence my implementation of a pseudo-injection.
+Within the `WidgetCounter` concrete class there is an optional constructor parameter, `$packSizes`.
+If this parameter is not set the class calls from the app config.
+I took this approach for greater ease of testing, and the ability to quickly change the available pack sizes.
 
-### Premium Partners
+##### Database Caching
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+While this is not an issue with the pack sizes in the initial scope of the task, it is possible that with a wider variety of pack sizes and order sizes the computation could become unwieldy.
+In order to combat that I have decided to store the result of every computation done, keyed by the available pack sizes and the size of the order.
+Now if an end user requests a combination of packs that the system has seen before, and the available pack sizes has not changed, the system can simply get that value from the database rather than recompute it.
 
-## Contributing
+### Installation and running
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Run the following in a terminal window (assuming a Mac or other Unix-based system):
 
-## Code of Conduct
+```shell
+composer install
+./vendor/bin/sail up -d
+./vendor/bin/sail composer install
+./vendor/bin/sail npm install
+./vendor/bin/sail npm run build
+./vendor/bin/sail artisan key:generate
+./vendor/bin/sail artisan migrate:fresh
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Now access `localhost`, and you should be greeted with a simple screen asking for a number of widgets.
+Enter a number, say `250`, click "Calculate", and the page will reload with the combination of packs, as well as a small readout stating whether or not the value was retrieved from the database.
 
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+In addition to the web interface you can enter into a terminal `./vendor/bin/sail artisan app:widget-counter-command {widgets}`, where `{widgets}` is the desired number of widgets, and you will be given a table with the pack sizes, as with the web interface.

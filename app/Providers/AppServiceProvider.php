@@ -25,8 +25,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Vite::prefetch(concurrency: 3);
-        DB::listen(function ($query) {
-            Log::info($query->sql, $query->bindings);
-        });
+        if ('local' === config('app.env')) {
+            DB::listen(function ($query) {
+                Log::info($query->sql, $query->bindings);
+            });
+        }
     }
 }

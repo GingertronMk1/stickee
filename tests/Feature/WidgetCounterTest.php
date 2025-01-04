@@ -1,5 +1,9 @@
 <?php
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
+
 $counter = new \App\Services\WidgetCounter([
     250, 500, 1000, 2000, 5000,
 ]);
@@ -21,7 +25,7 @@ foreach ($results as $widgets => $output) {
     test(
         "Test for {$widgets} widgets",
         function () use ($counter, $widgets, $output) {
-            expect($counter->getWidgetPacks($widgets))->toBe($output);
+            expect($counter->getWidgetPacks($widgets)->packs)->toBe($output);
         }
     );
 }

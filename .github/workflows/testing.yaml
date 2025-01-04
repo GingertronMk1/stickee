@@ -40,7 +40,7 @@ jobs:
                 ./vendor/bin/sail artisan key:generate
                 ./vendor/bin/sail artisan migrate:fresh
             - name: PHP Style
-              run: ./vendor/bin/sail composer pint
+              run: ./vendor/bin/sail composer pint -- --test
               if: always()
             - name: Test
               run: ./vendor/bin/sail artisan test --parallel --coverage

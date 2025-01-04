@@ -2,29 +2,45 @@
 
 namespace App\Services;
 
+use App\Models\PackCalculation;
 use App\WidgetCounterInterface;
 
 readonly class WidgetCounter implements WidgetCounterInterface
 {
     /** @var array<int> */
-    private array $packCount;
+    private array $packSizes;
 
     public function __construct(
-        ?array $packCount = null
+        ?array $packSizes = null
     ) {
-        $packCount ??= config('widgets.packs');
-        ksort($packCount);
-        $this->packCount = $packCount;
+        $packSizes ??= config('widgets.packs');
+        ksort($packSizes);
+        $this->packSizes = $packSizes;
     }
 
-    public function getWidgetPacks(int $widgetsOrdered): array
+    public function getWidgetPacks(int $widgetsOrdered): PackCalculation
     {
-        return $this->recursiveGetPacks($widgetsOrdered, true);
+        $storedCalc = PackCalculation::where('pack_sizes', json_encode($this->getPackSizes()))
+            ->where('widget_count', $widgetsOrdered)
+            ->first();
+
+        if (! is_null($storedCalc)) {
+            $packs = $storedCalc;
+        } else {
+            $packs = new PackCalculation([
+                'pack_sizes' => $this->getPackSizes(),
+                'widget_count' => $widgetsOrdered,
+                'packs' => $this->recursiveGetPacks($widgetsOrdered, true),
+            ]);
+            $packs->save();
+        }
+
+        return $packs;
     }
 
     private function recursiveGetPacks(int $num, bool $firstRound)
     {
-        $lookup = array_reverse($this->packCount);
+        $lookup = array_reverse($this->packSizes);
         $packsToSend = [];
 
         foreach ($lookup as $n) {
@@ -64,5 +80,10 @@ readonly class WidgetCounter implements WidgetCounterInterface
         }
 
         return $packsToSend;
+    }
+
+    public function getPackSizes(): array
+    {
+        return $this->packSizes;
     }
 }

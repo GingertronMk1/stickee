@@ -1,5 +1,24 @@
 # Technical Test for Stickee
 
+### Installation and running
+
+Run the following in a terminal window (assuming a Mac or other Unix-based system):
+
+```shell
+composer install
+./vendor/bin/sail up -d
+./vendor/bin/sail composer install
+./vendor/bin/sail npm install
+./vendor/bin/sail npm run build
+./vendor/bin/sail artisan key:generate
+./vendor/bin/sail artisan migrate:fresh
+```
+
+Now access `localhost`, and you should be greeted with a simple screen asking for a number of widgets.
+Enter a number, say `250`, click "Calculate", and the page will reload with the combination of packs, as well as a small readout stating whether or not the value was retrieved from the database.
+
+In addition to the web interface you can enter into a terminal `./vendor/bin/sail artisan app:widget-counter-command {widgets}`, where `{widgets}` is the desired number of widgets, and you will be given a table with the pack sizes, as with the web interface.
+
 ### Description
 
 This is a platform built using Laravel, Tailwind, Typescript, and Inertia for the completion of a technical task given to me by Stickee.
@@ -41,21 +60,10 @@ While this is not an issue with the pack sizes in the initial scope of the task,
 In order to combat that I have decided to store the result of every computation done, keyed by the available pack sizes and the size of the order.
 Now if an end user requests a combination of packs that the system has seen before, and the available pack sizes has not changed, the system can simply get that value from the database rather than recompute it.
 
-### Installation and running
+### Further thoughts and next steps
 
-Run the following in a terminal window (assuming a Mac or other Unix-based system):
+My understanding is that when one is using Laravel, one should "lean in" to the Laravel way of doing things - using facades, eloquent, and so on.
+I believe that I have done this as far as possible, however with the "config injection" above I've gone back to a Symfony-ish way of doing things.
+This is definitely one of the aspects of Laravel that I am keen to get a better understanding of, at least in so far as how this would be done at scale in a professional environment.
 
-```shell
-composer install
-./vendor/bin/sail up -d
-./vendor/bin/sail composer install
-./vendor/bin/sail npm install
-./vendor/bin/sail npm run build
-./vendor/bin/sail artisan key:generate
-./vendor/bin/sail artisan migrate:fresh
-```
-
-Now access `localhost`, and you should be greeted with a simple screen asking for a number of widgets.
-Enter a number, say `250`, click "Calculate", and the page will reload with the combination of packs, as well as a small readout stating whether or not the value was retrieved from the database.
-
-In addition to the web interface you can enter into a terminal `./vendor/bin/sail artisan app:widget-counter-command {widgets}`, where `{widgets}` is the desired number of widgets, and you will be given a table with the pack sizes, as with the web interface.
+In terms of next steps, the main one would be to move the pack sizes from an environment variable into the database, with a basic CRUD screen allowing a user to add/remove/modify individual sizes.

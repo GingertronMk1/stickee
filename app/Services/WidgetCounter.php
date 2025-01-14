@@ -20,13 +20,9 @@ readonly class WidgetCounter implements WidgetCounterInterface
 
     public function getWidgetPacks(int $widgetsOrdered): PackCalculation
     {
-        try {
-            $storedCalc = PackCalculation::where('pack_sizes', json_encode($this->getPackSizes()))
-                ->where('widget_count', $widgetsOrdered)
-                ->first();
-        } catch (\Throwable $e) {
-            $storedCalc = null;
-        }
+        $storedCalc = PackCalculation::where('pack_sizes', json_encode($this->getPackSizes()))
+            ->where('widget_count', $widgetsOrdered)
+            ->first();
 
         if (! is_null($storedCalc)) {
             $packs = $storedCalc;

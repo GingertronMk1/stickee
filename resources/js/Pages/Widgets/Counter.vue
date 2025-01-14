@@ -2,7 +2,7 @@
 import {useForm} from "@inertiajs/vue3";
 
 interface PackCalculation {
-    pack_sizes: Array<number>;
+    pack_sizes: number[];
     widget_count: number;
     packs: Record<number, number>;
     created_at?: Date;
@@ -12,6 +12,9 @@ const props = defineProps<{
     widgets?: number,
     packs: PackCalculation,
     lookedUp: boolean,
+    errors: {
+        widgets: string
+    },
 }>();
 
 const form = useForm<{ widgets?: number }>({widgets: props.widgets});
@@ -27,7 +30,8 @@ const submit = () => form.get('/');
         <div class="w-11/12 max-w-screen-xl mx-auto">
             <div class="border-2 border-gray-500 rounded-lg p-4 mb-3">
                 <label for="widget_count" class="flex flex-col mb-3">
-                    Please enter the desired number of Widgets
+                    <span>Please enter the desired number of Widgets</span>
+                    <span v-if="errors.widgets" v-text="errors.widgets" class="text-red-600" />
                     <input name="widget_count" v-model="form.widgets" type="number" min="0" class="rounded-md"/>
                 </label>
                 <button @click="submit" class="bg-blue-700 rounded-md text-white p-2">Calculate</button>

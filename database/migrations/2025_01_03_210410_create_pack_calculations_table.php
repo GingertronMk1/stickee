@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('pack_calculations', function (Blueprint $table) {
             $table->id();
             $table->string('pack_sizes')->index();
-            $table->integer('widget_count')->index();
+            $table->integer('widget_count');
             $table->string('packs');
             $table->timestamps();
         });
